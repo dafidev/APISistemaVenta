@@ -9,6 +9,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using SistemaVenta.DAL.Repositories;
+using SistemaVenta.DAL.Repositories.Contract;
+
 namespace SistemaVenta.IOC;
 public static class Dependency
 {
@@ -18,5 +21,11 @@ public static class Dependency
         {
             options.UseSqlServer(configuration.GetConnectionString("SqlString"));
         });
+
+        //Es genérico, sin lógica propia, liviano, se puede recrear sin problema
+        services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+        //Usa DbContext, mantiene una transacción y lógica de venta → debe ser coherente durante toda la petición
+        services.AddScoped<ISaleRepository, SaleRepository>();
     }
 }

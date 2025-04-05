@@ -46,10 +46,13 @@ public class GenericRepository<TEntity>: IGenericRepository<TEntity> where TEnti
         }
     }
 
-    public Task<bool> Edit(TEntity entity)
+    public async Task<bool> Edit(TEntity entity)
     {
         try
         {
+            _dbContext.Set<TEntity>().Update(entity);
+            await _dbContext.SaveChangesAsync();
+            return true; 
 
         }
         catch
@@ -58,11 +61,13 @@ public class GenericRepository<TEntity>: IGenericRepository<TEntity> where TEnti
         }
     }
 
-    public Task<bool> Delete(TEntity entity)
+    public async Task<bool> Delete(TEntity entity)
     {
         try
         {
-
+            _dbContext.Set<TEntity>().Remove(entity);
+            await _dbContext.SaveChangesAsync();
+            return true; 
         }
         catch
         {
@@ -70,11 +75,15 @@ public class GenericRepository<TEntity>: IGenericRepository<TEntity> where TEnti
         }
     }
 
-    public Task<IQueryable<TEntity>> Query(Expression<Func<TEntity, bool>> filter = null)
+    public IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> filter = null)
     {
         try
         {
-
+            IQueryable<TEntity> queryEntity = 
+                filter == null 
+                ? _dbContext.Set<TEntity>()
+                : _dbContext.Set<TEntity>().Where(filter);
+            return queryEntity;
         }
         catch
         {
